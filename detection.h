@@ -1061,7 +1061,7 @@ int readParams(char *fname, char *dname, int n, controlStruct *control)
 			//else if (strcasecmp(param,"NSUB")==0)
       			//	fscanf(fin,"%d",&(control->nsub));
 			else if (strcasecmp(param,"WHITE_LEVEL")==0)
-      				fscanf(fin,"%lf",&(control->whiteLevel));
+      				fscanf(fin,"%lf",&(control->whiteLevel0));
 			else if (strcasecmp(param,"CFLUX0")==0)
 			      	fscanf(fin,"%lf",&(control->cFlux0));
 			else if (strcasecmp(param,"CFLUX1")==0)
