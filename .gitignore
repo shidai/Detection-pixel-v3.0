@@ -1,0 +1,6 @@
+detection
+detection_matched
+detection_matched_t
+*out*
+*.swp
+result/
