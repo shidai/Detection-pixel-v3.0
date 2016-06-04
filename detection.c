@@ -105,57 +105,63 @@ int main (int argc, char* argv[])
 		//preAllocateMemory (&acfStructure, &control);
 		//allocateMemory (&acfStructure);
 
+		//num = (int)((control.scint_ts1-control.scint_ts0)/control.scint_ts_step);
+		//for (tdiff=control.scint_ts0; tdiff<control.scint_ts1; tdiff+=control.scint_ts_step)
+		//for (i=id; i<=num; i+=p)
 		for (i=id; i<nt; i+=p)
 		{
 			control.nsub = tdiss[i];
 			control.tsub = control.T/(double)(control.nsub);
-			control.scint_ts = control.tsub/2.0+0.1;
+			//control.scint_ts = control.tsub/2.0;
 
-			control.whiteLevel = control.whiteLevel0*sqrt(control.nsub*control.nchan);  // 0.1 gives 1 to a 10*10 dynamic spectrum
-		
-			calNoise (&noiseStructure, &control);
-
-			flux0 = control.cFlux0;
-			flux1 = control.cFlux1;
-			
-			acfStructure.probability = 1.0;
-				
-			calculateScintScale (&acfStructure, &control);
-			//printf ("calculateScintScal\n");
-
-			nMax = 0;
-			while (fabs(acfStructure.probability-0.8) >= control.precision && nMax <= 100)
+			if (((int)control.tsub%(int)control.scint_ts) == 0.0 || control.tsub < control.scint_ts)
 			{
-				control.cFlux = flux0+(flux1-flux0)/2.0;
-				//printf ("%lf %lf %.8lf %.3f\n", tdiff, fdiff, control.cFlux, acfStructure.probability);
+				control.whiteLevel = control.whiteLevel0*sqrt(control.nsub*control.nchan);  // 0.1 gives 1 to a 10*10 dynamic spectrum
 		
-				// simulate dynamic spectra
-				calculateNDynSpec (&acfStructure, &control, &noiseStructure);
+				calNoise (&noiseStructure, &control);
 
-				//if (control.noplot==0 && n == 1)
-				//{
-				//	// plot while simulating
-				//	heatMap (&acfStructure, dname);
-				//}
+				flux0 = control.cFlux0;
+				flux1 = control.cFlux1;
+				
+				acfStructure.probability = 1.0;
+					
+				calculateScintScale (&acfStructure, &control);
+				//printf ("calculateScintScal\n");
 
-				// merged into calculateNDynSpec
-				//qualifyVar (&acfStructure, &noiseStructure, &control);
-
-				if (acfStructure.probability>0.8)
+				nMax = 0;
+				while (fabs(acfStructure.probability-0.8) >= control.precision && nMax <= 100)
 				{
-					flux1 = control.cFlux;
+					control.cFlux = flux0+(flux1-flux0)/2.0;
+					//printf ("%lf %lf %.8lf %.3f\n", tdiff, fdiff, control.cFlux, acfStructure.probability);
+		
+					// simulate dynamic spectra
+					calculateNDynSpec (&acfStructure, &control, &noiseStructure);
+
+					//if (control.noplot==0 && n == 1)
+					//{
+					//	// plot while simulating
+					//	heatMap (&acfStructure, dname);
+					//}
+
+					// merged into calculateNDynSpec
+					//qualifyVar (&acfStructure, &noiseStructure, &control);
+
+					if (acfStructure.probability>0.8)
+					{
+						flux1 = control.cFlux;
+					}
+					else 
+					{
+						flux0 = control.cFlux;
+					}
+					nMax++;
+					//printf ("%lf %f %d\n", control.cFlux, acfStructure.probability, nMax);
 				}
-				else 
-				{
-					flux0 = control.cFlux;
-				}
-				nMax++;
-				//printf ("%lf %f %d\n", control.cFlux, acfStructure.probability, nMax);
+					
+				printf ("%d %lf %lf %f %lf %d\n", control.nsub, control.whiteLevel, noiseStructure.detection, control.cFlux, acfStructure.probability, nMax);
+					
+				deallocateMemory (&acfStructure);
 			}
-				
-			printf ("%d %lf %lf %f %lf %d\n", control.nsub, control.whiteLevel, noiseStructure.detection, control.cFlux, acfStructure.probability, nMax);
-				
-			deallocateMemory (&acfStructure);
 		}
 
 		fflush (stdout);

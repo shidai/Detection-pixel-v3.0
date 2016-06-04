@@ -255,7 +255,8 @@ int calculateScintScale (acfStruct *acfStructure, controlStruct *control)
 
 	acfStructure->cFreq = control->cFreq; // MHz
 	acfStructure->bw = fabs(control->chanBW*control->nchan); // MHz
-	acfStructure->tint = control->T;  // s
+	acfStructure->tint = control->nsub*control->tsub;  // s
+	//acfStructure->tint = control->T;  // s
 	acfStructure->f0 = control->scint_freqbw;  // MHz
 	acfStructure->t0 = control->scint_ts; // s
 
